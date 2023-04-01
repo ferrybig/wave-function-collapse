@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/style.css"/>
+	</head>
+	<body>
+		<form class="app" id="form">
+			<div class="output">
+				<canvas id="canvas"/>
+			</div>
+			<div class="controls">
+				<label class="label">
+					<span>Tileset</span>
+					<select id="tileset" required>
+					</select>
+				</label>
+				<label class="label">
+					<span>Tile width</span>
+					<output id="tileWidth">
+				</label>
+				<label class="label">
+					<span>Tile height</span>
+					<output id="tileHeight">
+				</label>
+				<label class="label">
+					<span>Width in tiles</span>
+					<input id="width" type="number" required value="10" step="1" min="1">
+				</label>
+				<label class="label">
+					<span>Height in tiles</span>
+					<input id="height" type="number" required value="10" step="1" min="1">
+				</label>
+				<span class="label">
+					<button type="reset">
+						Reset
+					</button>
+				</span>
+			</div>
+			<div class="generate">
+				<label class="label">
+					<span>Canvas width</span>
+					<output id="outputWidth">
+				</label>
+				<label class="label">
+					<span>Canvas height</span>
+					<output id="outputHeight">
+				</label>
+				<span class="label">
+					<button type="submit" value="">
+						Generate
+					</button>
+				</span>
+				<span class="label">
+					<button type="submit" value="step">
+						Run single step
+					</button>
+				</span>
+				<span class="label">
+					<button type="submit" value="reset">
+						Reset
+					</button>
+				</span>
+			</div>
+		</form>
+		<script type="module" src="/src/index.ts"></script>
+	</body>
+</html>
