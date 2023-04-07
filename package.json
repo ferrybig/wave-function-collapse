@@ -10,6 +10,7 @@
     "lint": "eslint . --fix"
   },
   "devDependencies": {
+    "@types/random-seed": "^0.3.3",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "eslint": "^8.37.0",
     "fast-xml-parser": "^4.1.3",

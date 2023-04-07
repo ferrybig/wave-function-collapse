@@ -6,62 +6,46 @@
 		<link rel="stylesheet" href="/style.css"/>
 	</head>
 	<body>
-		<form class="app" id="form">
-			<div class="output">
-				<canvas id="canvas"/>
+		<div class="app">
+			<div class="app__output" id="output-canvas-container">
 			</div>
-			<div class="controls">
-				<label class="label">
+			<form class="app__tileset" id="tileset-section">
+				<label class="controls">
 					<span>Tileset</span>
 					<select id="tileset" required>
 					</select>
 				</label>
-				<label class="label">
-					<span>Tile width</span>
-					<output id="tileWidth">
+				<label class="controls">
+					<span>Tile size</span>
+					<output id="tileSize" for="tileset">
 				</label>
-				<label class="label">
-					<span>Tile height</span>
-					<output id="tileHeight">
-				</label>
-				<label class="label">
+			</form>
+			<form class="app__configuration" id="configuration">
+				<label class="controls">
 					<span>Width in tiles</span>
 					<input id="width" type="number" required value="10" step="1" min="1">
 				</label>
-				<label class="label">
+				<label class="controls">
 					<span>Height in tiles</span>
 					<input id="height" type="number" required value="10" step="1" min="1">
 				</label>
-				<span class="label">
+				<span class="controls">
 					<button type="reset">
 						Reset
 					</button>
 				</span>
-			</div>
-			<div class="generate">
-				<label class="label">
-					<span>Canvas width</span>
-					<output id="outputWidth">
+			</form>
+			<div class="app__generate generation">
+				<span class="generation__buttons" id="generation-buttons">
+				</span>
+				<label class="controls">
+					<span>State</span>
+					<output id="generateStatus">
 				</label>
-				<label class="label">
-					<span>Canvas height</span>
-					<output id="outputHeight">
+				<label class="controls">
+					<span>Progress</span>
+					<output id="generateProgress">
 				</label>
-				<span class="label">
-					<button type="submit" value="">
-						Generate
-					</button>
-				</span>
-				<span class="label">
-					<button type="submit" value="step">
-						Run single step
-					</button>
-				</span>
-				<span class="label">
-					<button type="submit" value="reset">
-						Reset
-					</button>
-				</span>
 			</div>
 		</form>
 		<script type="module" src="/src/index.ts"></script>

@@ -12,8 +12,8 @@ import wallriverImage from './wallriver.png';
 import wallroadImage from './wallroad.png';
 
 
-export const width = 5;
-export const height = 5;
+export const width = 7;
+export const height = 7;
 
 const ROAD = 'R';
 const WATER = 'W';
@@ -108,6 +108,7 @@ export const tiles: Record<string, SimpleTile> = {
 			LAND,
 			LAND,
 		],
+		avoidSelf: true,
 	},
 	wall:  {
 		images: [wallImage],

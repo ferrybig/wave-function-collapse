@@ -1,3 +1,83 @@
-.canvas {
-	image-rendering: pixelated 
+:root {
+	--text: #111122;
+	--background: #fafaff;
+	--background-checker: #e6e6ef;
+	--background-gray: #e6e6ef;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--text: #f0f0f0;
+		--background: #333344;
+		--background-gray: #000011;
+		--background-checker: #555577;
+	}
+}
+
+body {
+	margin: 0;
+	background: var(--background-gray);
+	color: var(--text);
+}
+.app {
+	display: grid;
+	grid-template: 
+		"output output output" 1fr
+		"tileset configuration generate" fit-content(170px)
+		/ 1fr 1fr 1fr;
+	gap: 8px;
+	padding: 8px;
+	box-sizing: border-box;
+	min-height: 100vh;
+	margin: 0;
+}
+.app__output, .app__generate, .app__tileset, .app__configuration {
+	background: var(--background);
+	border-radius: 8px;
+	padding: 4px;
+}
+.app__output {
+	grid-area: output;
+	position: relative;
+	background: 
+		repeating-conic-gradient(var(--background-checker) 0% 25%, var(--background) 0% 50%) 
+		50% / 20px 20px
+}
+.app__tileset {
+	grid-area: tileset;
+	overflow-y: scroll;
+}
+.app__configuration {
+	grid-area: configuration;
+}
+.app__generate {
+	grid-area: generate;
+}
+.controls {
+	display: flex;
+	flex-direction: column;
+	margin: 0 0 8px;
+}
+.tile-preview {
+	display: grid;
+	gap: 8px;
+	grid-template-columns: repeat(auto-fit, 64px);
+}
+.tile-preview__tile {
+	image-rendering: pixelated;
+	width: 64px;
+	height: 64px;
+	background: var(--background);
+}
+.output-grid {
+	position: absolute;
+	overflow: clip;
+	inset: 0;
+	cursor: grab;
+}
+.output-grid__canvas {
+	background: var(--background);
+	image-rendering: pixelated;
+	position: absolute;
+	top: 50%;
+	left: 50%;
 }

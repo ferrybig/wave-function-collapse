@@ -1,35 +1,26 @@
-export interface Connector {
-	left: string,
-	right: string,
-}
-
 export type Connector2D = [
-	Connector,
-	Connector,
-	Connector,
-	Connector,
+	string,
+	string,
+	string,
+	string,
 ];
 
-function rotateAndFlipConnections(connections: Connector2D, rotate: 0 | 90 | 180 | 270, flip: boolean): Connector2D {
-
-}
-
 export class Tile {
+	public readonly loadPromise: Promise<unknown>;
+	public isLoaded = false;
+
 	public constructor(
-		public drawImage: ((ctx: CanvasRenderingContext2D) => boolean),
-		public weight: number,
-		public connections: Connector2D,
+		public readonly drawImage: ((ctx: CanvasRenderingContext2D) => void),
+		public readonly weight: number,
+		public readonly connections: Connector2D,
+		loadPromise: Promise<unknown>,
+		public readonly id: string,
+		public readonly baseName: string,
+		public readonly avoidSelfConnection: boolean,
 	) {
-	}
-
-
-	public static create(
-		draw: (ctx: CanvasRenderingContext2D, flip: boolean, rotate: 0 | 90 | 180 | 270) => boolean,
-		weight: number,
-		flip: boolean,
-		rotate: 0 | 90 | 180 | 270,
-		connections: Connector2D,
-	) {
-		return new Tile(ctx => draw(ctx, flip, rotate), weight, rotateAndFlipConnections(connections, rotate, flip));
+		this.loadPromise = loadPromise.then((e) => {
+			this.isLoaded = true;
+			return e;
+		});
 	}
 }
