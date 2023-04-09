@@ -1,6 +1,7 @@
 import { Tile } from '../Tile';
 
 export class GridCell {
+	public onUpdate: (() => void)[] = [];
 	constructor(
 		public readonly x: number,
 		public readonly y: number,
@@ -8,6 +9,5 @@ export class GridCell {
 		public validOptions: Tile[],
 		public validOptionsWeight: number,
 	) {
-
 	}
 }

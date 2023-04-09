@@ -5,5 +5,5 @@ export default Object.entries(
 		width: number,
 		height: number,
 		tiles: Record<string, SimpleTile>,
-	}>('./*/index.ts'),
-).map(([key, value]) => [key.substring(2, key.length - '/index.ts'.length), value] as const);
+	}>('./*/*.ts'),
+).map(([key, value]) => [key.replace(/^.\/([^/]*)\/([^.]*).ts$/, (g0, g1, g2) => g2 === 'index' ? g1 : `${g1} - ${g2}`), value] as const);

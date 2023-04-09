@@ -15,7 +15,7 @@ function symmetryToCount(symmetry) {
 	case 'F':
 		return 8;
 	case 'X':
-		 return 1;
+		return 1;
 	case 'L':
 	case 'T':
 		return 4;

@@ -1,4 +1,4 @@
 export * from './Grid';
-export * from './GridTile';
+export * from './GridCell';
 export * from './TileCache';
 export * from './waveCollapseStep';

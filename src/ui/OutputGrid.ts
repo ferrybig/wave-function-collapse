@@ -4,7 +4,7 @@ import { LoadedTiles } from '../LoadedTiles';
 
 interface OutputGridEventMap {
 	playing: boolean,
-	autoStop: boolean,
+	autoStart: boolean,
 	progress: number,
 	total: number,
 }
@@ -26,13 +26,13 @@ export class OutputGrid extends HTMLElement {
 	#autoPlayRenderedInSecond = 0;
 	#needsReset = false;
 	#playing = false;
-	#autoStop = false;
+	#autoPlay = false;
 	#scale = 1;
 	#translate: [number, number] = [0, 0];
 	#idleCallbackId: ReturnType<typeof requestIdleCallback> | null = null;
 	#animationId: ReturnType<typeof requestAnimationFrame> | null = null;
 	#listeners: Record<keyof OutputGridEventMap, ((this: OutputGrid, value: OutputGridEventMap[keyof OutputGridEventMap]) => void)[]> = {
-		autoStop: [],
+		autoStart: [],
 		playing: [],
 		progress: [],
 		total: [],
@@ -42,13 +42,14 @@ export class OutputGrid extends HTMLElement {
 	public connectedCallback() {
 		this.classList.add('output-grid');
 		this.#canvas.classList.add('output-grid__canvas');
+		this.#canvas.width = 0;
 		this.appendChild(this.#canvas);
 		this.addEventListener('mousedown', () => {
 			const mouseMove = (e: MouseEvent)=> {
 				this.#translate = [this.#translate[0] + e.movementX, this.#translate[1] + e.movementY];
 				this.#updateTransform();
 			};
-			const mouseUp= ()=> {
+			const mouseUp= () => {
 				this.removeEventListener('mousemove', mouseMove);
 				this.removeEventListener('mouseup', mouseUp);
 			};
@@ -99,25 +100,31 @@ export class OutputGrid extends HTMLElement {
 	}
 	#idleCallback(deadline: IdleDeadline) {
 		this.#idleCallbackId = null;
+		console.log('idleCallback');
 		const previousNow = this.#autoPlayLastUpdate;
 		this.#autoPlayLastUpdate = Date.now();
 
 		this.#autoPlayRenderedInSecond = this.#autoPlayRenderedInSecond - this.#autoPlaySpeed * Math.min(1000, this.#autoPlayLastUpdate - previousNow);
-		if (this.#autoPlayRenderedInSecond < 0) this.#autoPlayRenderedInSecond = 0;
+		if (this.#autoPlayRenderedInSecond < 0 || Number.isNaN(this.#autoPlayRenderedInSecond)) this.#autoPlayRenderedInSecond = 0;
 		if (this.#autoPlayRenderedInSecond > this.#autoPlaySpeed) this.#autoPlayRenderedInSecond = this.#autoPlaySpeed;
 		let didStep = true;
 		while (
 			this.#autoPlayRenderedInSecond <= this.#autoPlaySpeed &&
-			!deadline.didTimeout &&
-			/*Date.now() - this.#autoPlayLastUpdate < 100 &&*/
-			deadline.timeRemaining() > 1 &&
+			deadline.timeRemaining() > 0 &&
 			didStep
 		) {
 			this.#autoPlayRenderedInSecond++;
 			didStep = this.#step();
 		}
+		console.log({
+			autoPlayRenderedInSecond: this.#autoPlayRenderedInSecond,
+			autoPlaySpeed: this.#autoPlaySpeed,
+			timesUp: deadline.timeRemaining() > 0,
+		});
 		if (didStep) {
 			this.#scheduleIdleCallback();
+		} else {
+			console.log('We are done rendering', this.#grid);
 		}
 	}
 	#scheduleIdleCallback() {
@@ -125,13 +132,14 @@ export class OutputGrid extends HTMLElement {
 	}
 	#animationFrame() {
 		this.#animationId = null;
+		console.log('animationFrame');
 		if (this.#idleCallbackId !== null) {
 			this.#scheduleAnimationFrame();
-		} else if (this.#autoStop) {
-			this.#playing = false;
-			this.#emit('playing', this.#playing);
+			this.#render();
+		} else {
+			console.log('canceling renderer, the idlecallback has stopped');
+			this.pause();
 		}
-		this.#render();
 	}
 	#scheduleAnimationFrame() {
 		if (this.#animationId === null) this.#animationId = requestAnimationFrame(() => this.#animationFrame());
@@ -139,8 +147,8 @@ export class OutputGrid extends HTMLElement {
 	public isPlaying() {
 		return this.#playing;
 	}
-	public isAutoStopping() {
-		return this.#autoStop;
+	public isAutoPlaying() {
+		return this.#autoPlay;
 	}
 	public step() {
 		if (this.#needsReset) this.reset();
@@ -149,6 +157,7 @@ export class OutputGrid extends HTMLElement {
 	}
 	public reset() {
 		this.#needsReset = false;
+		this.#needsRender = [];
 		this.#grid = new Grid(this.#x, this.#y, this.#cache);
 		this.#canvas.width = this.#x*this.#tileWidth;
 		this.#canvas.height = this.#y*this.#tileHeight;
@@ -175,11 +184,14 @@ export class OutputGrid extends HTMLElement {
 		this.#scheduleAnimationFrame();
 		this.#scheduleIdleCallback();
 		this.#playing = true;
+		this.#emit('playing', this.#playing);
 	}
 	public pause() {
+		if (!this.#playing) return;
 		this.#cancelScheduledTasks();
 		if (this.#needsRender.length > 0) this.#render();
 		this.#playing = false;
+		this.#emit('playing', this.#playing);
 	}
 	#cancelScheduledTasks() {
 		if (this.#idleCallbackId) cancelIdleCallback(this.#idleCallbackId);

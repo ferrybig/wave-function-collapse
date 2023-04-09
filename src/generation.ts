@@ -3,10 +3,9 @@ import { OutputGrid } from './ui';
 
 
 const buttons: Record<string, (grid: OutputGrid) => void> = {
-	play: (grid) => grid.play(),
-	pause: (grid) => grid.pause(),
 	step: (grid) => grid.step(),
-	reset: (grid) => grid.reset(),
+	clear: (grid) => grid.reset(),
+	regenerate: (grid) => { grid.reset(); grid.play(); },
 };
 
 export default function generation() {
