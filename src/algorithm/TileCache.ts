@@ -17,22 +17,22 @@ export class TileCache {
 
 	public readonly getTileConnections = memoize((top: Tile[], right: Tile[], bottom: Tile[], left: Tile[]) =>
 		this.validOptions.filter(tile =>
-			top.find(topTile =>
+			(top.length === 0 || top.find(topTile =>
 				tile.connections[0] === reverse(topTile.connections[2]) &&
 				(!tile.avoidSelfConnection || tile.baseName !== topTile.baseName),
-			) &&
-			right.find(rightTile =>
+			)) &&
+			(right.length === 0 || right.find(rightTile =>
 				tile.connections[1] === reverse(rightTile.connections[3]) &&
 				(!tile.avoidSelfConnection || tile.baseName !== rightTile.baseName),
-			) &&
-			bottom.find(bottomTile =>
+			)) &&
+			(bottom.length === 0 || bottom.find(bottomTile =>
 				tile.connections[2] === reverse(bottomTile.connections[0]) &&
 				(!tile.avoidSelfConnection || tile.baseName !== bottomTile.baseName),
-			) &&
-			left.find(leftTile =>
+			)) &&
+			(left.length === 0 || left.find(leftTile =>
 				tile.connections[3] === reverse(leftTile.connections[1]) &&
 				(!tile.avoidSelfConnection || tile.baseName !== leftTile.baseName),
-			),
+			)),
 		)
 	, {
 		key: (...sides) => sides.map(e => `[${e.map(t => t.id).join(',')}]`).join(','),
