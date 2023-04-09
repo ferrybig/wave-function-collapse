@@ -43,58 +43,59 @@ import waterturn3Image from './waterturn 3.png';
 export const width = 48;
 export const height = 48;
 
-const CLIFF_CLOCKWISE = 'C';
-const CLIFF_COUNTER_CLOCKWISE = 'c';
-const LANDS = 'L';
+const CLIFF_HIGH = 'C';
+const CLIFF_LOW = 'c';
+const LAND = 'LL';
 const WATER = 'W';
+const ROAD = 'R';
 
 export const tiles: Record<string, SimpleTile> = {
 	cliff: {
 		images: [
 			cliff0Image,
-			cliff1Image,
-			cliff2Image,
 			cliff3Image,
+			cliff2Image,
+			cliff1Image,
 		],
 		weight: 1,
 		symmetry: 'T',
 		connections: [
-			HIGH_LANDS,
-			CLIFF,
-			LANDS,
-			CLIFF,
+			LAND,
+			CLIFF_HIGH + CLIFF_LOW,
+			LAND,
+			CLIFF_LOW + CLIFF_HIGH,
 		],
 	},
 	cliffcorner: {
 		images: [
 			cliffcorner0Image,
-			cliffcorner1Image,
-			cliffcorner2Image,
 			cliffcorner3Image,
+			cliffcorner2Image,
+			cliffcorner1Image,
 		],
 		weight: 1,
 		symmetry: 'L',
 		connections: [
-			CLIFF,
-			CLIFF,
-			HIGH_LANDS,
-			HIGH_LANDS,
+			CLIFF_HIGH + CLIFF_LOW,
+			CLIFF_LOW + CLIFF_HIGH,
+			LAND,
+			LAND,
 		],
 	},
 	cliffturn: {
 		images: [
 			cliffturn0Image,
-			cliffturn1Image,
-			cliffturn2Image,
 			cliffturn3Image,
+			cliffturn2Image,
+			cliffturn1Image,
 		],
 		weight: 1,
 		symmetry: 'L',
 		connections: [
-			CLIFF,
-			CLIFF,
-			LANDS,
-			LANDS,
+			CLIFF_LOW + CLIFF_HIGH,
+			CLIFF_HIGH + CLIFF_LOW,
+			LAND,
+			LAND,
 		],
 	},
 	grass: {
@@ -104,58 +105,58 @@ export const tiles: Record<string, SimpleTile> = {
 		weight: 1,
 		symmetry: 'X',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			LAND,
+			LAND,
+			LAND,
+			LAND,
 		],
 	},
 	grasscorner: {
 		images: [
 			grasscorner0Image,
-			grasscorner1Image,
-			grasscorner2Image,
 			grasscorner3Image,
+			grasscorner2Image,
+			grasscorner1Image,
 		],
 		weight: 0.01,
 		symmetry: 'L',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			ROAD + LAND,
+			LAND + ROAD,
+			ROAD,
+			ROAD,
 		],
 	},
 	road: {
 		images: [
 			road0Image,
-			road1Image,
-			road2Image,
 			road3Image,
+			road2Image,
+			road1Image,
 		],
 		weight: 0.05,
 		symmetry: 'T',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			ROAD,
+			ROAD + LAND,
+			LAND,
+			LAND + ROAD,
 		],
 	},
 	roadturn: {
 		images: [
 			roadturn0Image,
-			roadturn1Image,
-			roadturn2Image,
 			roadturn3Image,
+			roadturn2Image,
+			roadturn1Image,
 		],
 		weight: 0.05,
 		symmetry: 'L',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			LAND + ROAD,
+			ROAD + LAND,
+			LAND,
+			LAND,
 		],
 	},
 	water_a: {
@@ -165,10 +166,10 @@ export const tiles: Record<string, SimpleTile> = {
 		weight: 1,
 		symmetry: 'X',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			WATER,
+			WATER,
+			WATER,
+			WATER,
 		],
 	},
 	water_b: {
@@ -178,10 +179,10 @@ export const tiles: Record<string, SimpleTile> = {
 		weight: 1,
 		symmetry: 'X',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			WATER,
+			WATER,
+			WATER,
+			WATER,
 		],
 	},
 	water_c: {
@@ -191,58 +192,58 @@ export const tiles: Record<string, SimpleTile> = {
 		weight: 1,
 		symmetry: 'X',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			WATER,
+			WATER,
+			WATER,
+			WATER,
 		],
 	},
 	watercorner: {
 		images: [
 			watercorner0Image,
-			watercorner1Image,
-			watercorner2Image,
 			watercorner3Image,
+			watercorner2Image,
+			watercorner1Image,
 		],
 		weight: 1,
 		symmetry: 'L',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			LAND + WATER,
+			WATER + LAND,
+			LAND,
+			LAND,
 		],
 	},
 	waterside: {
 		images: [
 			waterside0Image,
-			waterside1Image,
-			waterside2Image,
 			waterside3Image,
+			waterside2Image,
+			waterside1Image,
 		],
 		weight: 1,
 		symmetry: 'T',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			WATER,
+			WATER+LAND,
+			LAND,
+			LAND + WATER,
 		],
 	},
 	waterturn: {
 		images: [
 			waterturn0Image,
-			waterturn1Image,
-			waterturn2Image,
 			waterturn3Image,
+			waterturn2Image,
+			waterturn1Image,
 		],
 		weight: 1,
 		symmetry: 'L',
 		connections: [
-			'xxx',
-			'xxx',
-			'xxx',
-			'xxx',
+			WATER,
+			WATER,
+			WATER+LAND,
+			LAND + WATER,
 		],
 	},
 };
