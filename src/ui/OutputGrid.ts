@@ -73,6 +73,7 @@ export class OutputGrid extends HTMLElement {
 	}
 	#updateTransform() {
 		this.#canvas.style.transform = `translate(-50%, -50%) translate(${this.#translate[0]}px,${this.#translate[1]}px) scale(${this.#scale})`;
+		this.#canvas.style.imageRendering = this.#scale > 1 ? 'pixelated' : '';
 	}
 	#step() {
 		const updates = waveCollapseStep(this.#grid, this.#random);

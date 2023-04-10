@@ -77,7 +77,6 @@ body {
 }
 .output-grid__canvas {
 	background: var(--background);
-	image-rendering: pixelated;
 	position: absolute;
 	top: 50%;
 	left: 50%;
