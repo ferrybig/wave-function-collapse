@@ -4,7 +4,7 @@ import { NextCalculator } from './NextCalculator';
 import { TileCache } from './TileCache';
 
 export class Grid {
-	#next: [number, (readonly GridCell[])[]] = [0, []];
+	#next: [number, (readonly GridCell[])[], boolean] = [0, [], false];
 	readonly #cells: GridCell[] = [];
 	readonly #nextCalcs: NextCalculator[] = [];
 
@@ -28,7 +28,7 @@ export class Grid {
 			}
 		}
 		this.#nextCalcs.push(current);
-		this.#next = [this.#cells.length, [this.#cells]];
+		this.#next = [this.#cells.length, [this.#cells], false];
 	}
 	#getCellOrNull(x: number, y: number): GridCell | null {
 		if (x < 0) return null;
@@ -47,20 +47,21 @@ export class Grid {
 
 	#updateNextList() {
 		if (this.#nextCalcs.length === 1) {
-			const val = this.#nextCalcs[0].get()[0];
-			this.#next = [val.length, [val]];
+			const [val,,hasStuckCell] = this.#nextCalcs[0].get();
+			this.#next = [val.length, [val], hasStuckCell];
 			return;
 		}
 		let foundWeight = Number.POSITIVE_INFINITY;
-		let next: [number, (readonly GridCell[])[]] = [0, []];
+		let next: [number, (readonly GridCell[])[], boolean] = [0, [], false];
 		for (const calc of this.#nextCalcs) {
-			const [cells, weight] = calc.get();
+			const [cells, weight, hasStuckCell] = calc.get();
 			if (weight < foundWeight) {
-				next = [cells.length, [cells]];
+				next = [cells.length, [cells], hasStuckCell];
 				foundWeight = weight;
 			} else if (weight === foundWeight) {
 				next[0]+= cells.length;
 				next[1].push(cells);
+				next[2] ||= hasStuckCell;
 			}
 		}
 		this.#next = next;

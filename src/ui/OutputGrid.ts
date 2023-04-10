@@ -100,7 +100,6 @@ export class OutputGrid extends HTMLElement {
 	}
 	#idleCallback(deadline: IdleDeadline) {
 		this.#idleCallbackId = null;
-		console.log('idleCallback');
 		const previousNow = this.#autoPlayLastUpdate;
 		this.#autoPlayLastUpdate = Date.now();
 
@@ -116,11 +115,6 @@ export class OutputGrid extends HTMLElement {
 			this.#autoPlayRenderedInSecond++;
 			didStep = this.#step();
 		}
-		console.log({
-			autoPlayRenderedInSecond: this.#autoPlayRenderedInSecond,
-			autoPlaySpeed: this.#autoPlaySpeed,
-			timesUp: deadline.timeRemaining() > 0,
-		});
 		if (didStep) {
 			this.#scheduleIdleCallback();
 		} else {
@@ -132,7 +126,6 @@ export class OutputGrid extends HTMLElement {
 	}
 	#animationFrame() {
 		this.#animationId = null;
-		console.log('animationFrame');
 		if (this.#idleCallbackId !== null) {
 			this.#scheduleAnimationFrame();
 			this.#render();
