@@ -2,7 +2,7 @@ import { LoadedTiles } from '../LoadedTiles';
 
 const glob = Object.entries(
 	import.meta.glob<true, '', Record<string, () => LoadedTiles>>('./*/*.ts', { eager: true }),
-).map(([key, value]) => [key.replace(/^.\/([^/]*)\/([^.]*).ts$/, (g0, g1, g2) => g2 === 'index' ? g1 : `${g1} - ${g2}`), value] as const);
+).map(([key, value]) => [key.replace(/^.\/([^/]*)\/([^.]*).ts$/, (_g0, g1, g2) => g2 === 'index' ? g1 : `${g1} - ${g2}`), value] as const);
 
 
 type TileSet = {

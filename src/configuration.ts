@@ -42,6 +42,9 @@ export function configuration(generatorModule: ReturnType<typeof generation>) {
 			tilePreview.render(selectedTileSet);
 		}
 	}
+	if (selectedTileSet === null) {
+		tileSetElement.value = '--disabled--';
+	}
 
 	function onSizeChange() {
 		if (height.valueAsNumber > 0 && width.valueAsNumber > 0 && selectedTileSet && selectedTileSet.tiles.length > 0) {
