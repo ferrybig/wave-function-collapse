@@ -6,6 +6,6 @@ for (let i = 2; i < process.argv.length; i++) {
 		return $1.toUpperCase()
 			.replace('-', '')
 			.replace('_', '');
-	})} from './${arg}'`);
+	})}Image from './${arg}'`);
 }
 export {};

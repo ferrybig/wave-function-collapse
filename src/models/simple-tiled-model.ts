@@ -1,6 +1,6 @@
 import { LoadedTiles } from '../LoadedTiles';
 import { Connector2D, Tile } from '../Tile';
-import { assertNever } from '../utils';
+import { imageToPromise, assertNever } from '../utils';
 
 export type Symmetry = 'X' | 'L' | 'T' | 'I' | '/' | 'F';
 export type SimpleTile = {
@@ -33,13 +33,6 @@ interface PreProcessedTile {
 		boolean,
 		boolean,
 	],
-}
-
-function loadPromise(image: HTMLImageElement) {
-	return new Promise<HTMLImageElement>((resolve, reject) => {
-		image.addEventListener('load', () => resolve(image));
-		image.addEventListener('error', (e) => reject(e.error));
-	});
 }
 
 function create(
@@ -96,7 +89,7 @@ function create(
 		},
 		weight/count,
 		connections,
-		loadPromise(definition.image),
+		imageToPromise(definition.image),
 		`${baseName}${extraId}-${rotate}-${flip ? 'flipped' : 'normal'}`,
 		baseName,
 		avoidSelf,
