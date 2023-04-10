@@ -1,4 +1,4 @@
-import { SimpleTile } from '../../models/simple-tiled-model';
+import { SimpleTile, simpleTiledModel } from '../../models/simple-tiled-model';
 import cliff0Image from './cliff 0.png';
 import cliff1Image from './cliff 1.png';
 import cliff2Image from './cliff 2.png';
@@ -40,211 +40,226 @@ import waterturn1Image from './waterturn 1.png';
 import waterturn2Image from './waterturn 2.png';
 import waterturn3Image from './waterturn 3.png';
 
-export const width = 48;
-export const height = 48;
-
 const CLIFF_HIGH = 'C';
 const CLIFF_LOW = 'c';
 const LAND = 'LL';
 const WATER = 'W';
 const ROAD = 'R';
 
-export const tiles: Record<string, SimpleTile> = {
-	cliff: {
-		images: [
-			cliff0Image,
-			cliff3Image,
-			cliff2Image,
-			cliff1Image,
-		],
-		weight: 1,
-		symmetry: 'T',
-		connections: [
-			LAND,
-			CLIFF_HIGH + CLIFF_LOW,
-			LAND,
-			CLIFF_LOW + CLIFF_HIGH,
-		],
-	},
-	cliffcorner: {
-		images: [
-			cliffcorner0Image,
-			cliffcorner3Image,
-			cliffcorner2Image,
-			cliffcorner1Image,
-		],
-		weight: 1,
-		symmetry: 'L',
-		connections: [
-			CLIFF_HIGH + CLIFF_LOW,
-			CLIFF_LOW + CLIFF_HIGH,
-			LAND,
-			LAND,
-		],
-	},
-	cliffturn: {
-		images: [
-			cliffturn0Image,
-			cliffturn3Image,
-			cliffturn2Image,
-			cliffturn1Image,
-		],
-		weight: 1,
-		symmetry: 'L',
-		connections: [
-			CLIFF_LOW + CLIFF_HIGH,
-			CLIFF_HIGH + CLIFF_LOW,
-			LAND,
-			LAND,
-		],
-	},
-	grass: {
-		images: [
-			grass0Image,
-		],
-		weight: 1,
-		symmetry: 'X',
-		connections: [
-			LAND,
-			LAND,
-			LAND,
-			LAND,
-		],
-	},
-	grasscorner: {
-		images: [
-			grasscorner0Image,
-			grasscorner3Image,
-			grasscorner2Image,
-			grasscorner1Image,
-		],
-		weight: 0.01,
-		symmetry: 'L',
-		connections: [
-			ROAD + LAND,
-			LAND + ROAD,
-			ROAD,
-			ROAD,
-		],
-	},
-	road: {
-		images: [
-			road0Image,
-			road3Image,
-			road2Image,
-			road1Image,
-		],
-		weight: 0.05,
-		symmetry: 'T',
-		connections: [
-			ROAD,
-			ROAD + LAND,
-			LAND,
-			LAND + ROAD,
-		],
-	},
-	roadturn: {
-		images: [
-			roadturn0Image,
-			roadturn3Image,
-			roadturn2Image,
-			roadturn1Image,
-		],
-		weight: 0.05,
-		symmetry: 'L',
-		connections: [
-			LAND + ROAD,
-			ROAD + LAND,
-			LAND,
-			LAND,
-		],
-	},
-	water_a: {
-		images: [
-			water_a0Image,
-		],
-		weight: 1,
-		symmetry: 'X',
-		connections: [
-			WATER,
-			WATER,
-			WATER,
-			WATER,
-		],
-	},
-	water_b: {
-		images: [
-			water_b0Image,
-		],
-		weight: 1,
-		symmetry: 'X',
-		connections: [
-			WATER,
-			WATER,
-			WATER,
-			WATER,
-		],
-	},
-	water_c: {
-		images: [
-			water_c0Image,
-		],
-		weight: 1,
-		symmetry: 'X',
-		connections: [
-			WATER,
-			WATER,
-			WATER,
-			WATER,
-		],
-	},
-	watercorner: {
-		images: [
-			watercorner0Image,
-			watercorner3Image,
-			watercorner2Image,
-			watercorner1Image,
-		],
-		weight: 1,
-		symmetry: 'L',
-		connections: [
-			LAND + WATER,
-			WATER + LAND,
-			LAND,
-			LAND,
-		],
-	},
-	waterside: {
-		images: [
-			waterside0Image,
-			waterside3Image,
-			waterside2Image,
-			waterside1Image,
-		],
-		weight: 1,
-		symmetry: 'T',
-		connections: [
-			WATER,
-			WATER+LAND,
-			LAND,
-			LAND + WATER,
-		],
-	},
-	waterturn: {
-		images: [
-			waterturn0Image,
-			waterturn3Image,
-			waterturn2Image,
-			waterturn1Image,
-		],
-		weight: 1,
-		symmetry: 'L',
-		connections: [
-			WATER,
-			WATER,
-			WATER+LAND,
-			LAND + WATER,
-		],
-	},
+const cliff: SimpleTile = {
+	images: [
+		cliff0Image,
+		cliff3Image,
+		cliff2Image,
+		cliff1Image,
+	],
+	weight: 1,
+	symmetry: 'T',
+	connections: [
+		LAND,
+		CLIFF_HIGH + CLIFF_LOW,
+		LAND,
+		CLIFF_LOW + CLIFF_HIGH,
+	],
+};
+const cliffcorner: SimpleTile = {
+	images: [
+		cliffcorner0Image,
+		cliffcorner3Image,
+		cliffcorner2Image,
+		cliffcorner1Image,
+	],
+	weight: 1,
+	symmetry: 'L',
+	connections: [
+		CLIFF_HIGH + CLIFF_LOW,
+		CLIFF_LOW + CLIFF_HIGH,
+		LAND,
+		LAND,
+	],
+};
+const cliffturn: SimpleTile = {
+	images: [
+		cliffturn0Image,
+		cliffturn3Image,
+		cliffturn2Image,
+		cliffturn1Image,
+	],
+	weight: 1,
+	symmetry: 'L',
+	connections: [
+		CLIFF_LOW + CLIFF_HIGH,
+		CLIFF_HIGH + CLIFF_LOW,
+		LAND,
+		LAND,
+	],
+};
+const grass: SimpleTile = {
+	images: [
+		grass0Image,
+	],
+	weight: 1,
+	symmetry: 'X',
+	connections: [
+		LAND,
+		LAND,
+		LAND,
+		LAND,
+	],
+};
+const grasscorner: SimpleTile = {
+	images: [
+		grasscorner0Image,
+		grasscorner3Image,
+		grasscorner2Image,
+		grasscorner1Image,
+	],
+	weight: 0.01,
+	symmetry: 'L',
+	connections: [
+		ROAD + LAND,
+		LAND + ROAD,
+		ROAD,
+		ROAD,
+	],
+};
+const road: SimpleTile = {
+	images: [
+		road0Image,
+		road3Image,
+		road2Image,
+		road1Image,
+	],
+	weight: 0.05,
+	symmetry: 'T',
+	connections: [
+		ROAD,
+		ROAD + LAND,
+		LAND,
+		LAND + ROAD,
+	],
+};
+const roadturn: SimpleTile = {
+	images: [
+		roadturn0Image,
+		roadturn3Image,
+		roadturn2Image,
+		roadturn1Image,
+	],
+	weight: 0.05,
+	symmetry: 'L',
+	connections: [
+		LAND + ROAD,
+		ROAD + LAND,
+		LAND,
+		LAND,
+	],
+};
+const water_a: SimpleTile = {
+	images: [
+		water_a0Image,
+	],
+	weight: 1,
+	symmetry: 'X',
+	connections: [
+		WATER,
+		WATER,
+		WATER,
+		WATER,
+	],
+};
+const water_b: SimpleTile = {
+	images: [
+		water_b0Image,
+	],
+	weight: 1,
+	symmetry: 'X',
+	connections: [
+		WATER,
+		WATER,
+		WATER,
+		WATER,
+	],
+};
+const water_c: SimpleTile = {
+	images: [
+		water_c0Image,
+	],
+	weight: 1,
+	symmetry: 'X',
+	connections: [
+		WATER,
+		WATER,
+		WATER,
+		WATER,
+	],
+};
+const watercorner: SimpleTile = {
+	images: [
+		watercorner0Image,
+		watercorner3Image,
+		watercorner2Image,
+		watercorner1Image,
+	],
+	weight: 1,
+	symmetry: 'L',
+	connections: [
+		LAND + WATER,
+		WATER + LAND,
+		LAND,
+		LAND,
+	],
+};
+const waterside: SimpleTile = {
+	images: [
+		waterside0Image,
+		waterside3Image,
+		waterside2Image,
+		waterside1Image,
+	],
+	weight: 1,
+	symmetry: 'T',
+	connections: [
+		WATER,
+		WATER+LAND,
+		LAND,
+		LAND + WATER,
+	],
+};
+const waterturn: SimpleTile = {
+	images: [
+		waterturn0Image,
+		waterturn3Image,
+		waterturn2Image,
+		waterturn1Image,
+	],
+	weight: 1,
+	symmetry: 'L',
+	connections: [
+		WATER,
+		WATER,
+		WATER+LAND,
+		LAND + WATER,
+	],
 };
 
+
+export default () => simpleTiledModel({
+	width: 48,
+	height: 48,
+	tiles: {
+		cliff,
+		cliffcorner,
+		cliffturn,
+		grass,
+		grasscorner,
+		road,
+		roadturn,
+		water_a,
+		water_b,
+		water_c,
+		watercorner,
+		waterside,
+		waterturn,
+	},
+});

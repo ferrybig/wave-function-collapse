@@ -27,7 +27,7 @@ function symmetryToCount(symmetry) {
 const doc = parser.parse(fs.readFileSync(process.argv[2]), 'application/xml');
 const tiles = doc.set.tiles.tile;
 let generatedCode = '';
-generatedCode += 'import { SimpleTile } from \'../../models/simple-tiled-model\';\n';
+generatedCode += 'import { simpleTiledModel, SimpleTile } from \'../../models/simple-tiled-model\';\n';
 for (const tile of tiles) {
 	if (doc.set['@_unique']) {
 		const count = symmetryToCount(tile['@_symmetry']);
@@ -38,33 +38,39 @@ for (const tile of tiles) {
 		generatedCode += `import ${tile['@_name']}Image from './${tile['@_name']}.png';\n`;
 	}
 }
+
 generatedCode += '\n';
-generatedCode += 'export const width = ;\n';
-generatedCode += 'export const height = ;\n';
-generatedCode += '\n';
-generatedCode += 'export const tiles: Record<string, SimpleTile> = {\n';
 for (const tile of tiles) {
-	generatedCode += `\t${tile['@_name']}: {\n`;
+	generatedCode += `const ${tile['@_name']}: SimpleTile = {\n`;
 
 	if (doc.set['@_unique']) {
 		const count = symmetryToCount(tile['@_symmetry']);
-		generatedCode += '\t\timages: [\n';
+		generatedCode += '\timages: [\n';
 		for (let i = 0; i < count; i++) {
-			generatedCode += `\t\t\t${tile['@_name']}${i}Image,\n`;
+			generatedCode += `\t\t${tile['@_name']}${i}Image,\n`;
 		}
-		generatedCode+= '\t\t],\n';
+		generatedCode+= 't\t],\n';
 	} else {
-		generatedCode += `\t\timages: [${tile['@_name']}Image],\n`;
+		generatedCode += `\timages: [${tile['@_name']}Image],\n`;
 	}
-	generatedCode += `\t\tweight: ${tile['@_weight'] ?? 1},\n`;
-	generatedCode += `\t\tsymmetry: '${tile['@_symmetry'] === '\\' ? '/' : tile['@_symmetry']}',\n`;
-	generatedCode += '\t\tconnections: [\n';
-	generatedCode += '\t\t\t"xxx",\n';
-	generatedCode += '\t\t\t"xxx",\n';
-	generatedCode += '\t\t\t"xxx",\n';
-	generatedCode += '\t\t\t"xxx",\n';
-	generatedCode += '\t\t],\n';
-	generatedCode += '\t},\n';
+	generatedCode += `\tweight: ${tile['@_weight'] ?? 1},\n`;
+	generatedCode += `\tsymmetry: '${tile['@_symmetry'] === '\\' ? '/' : tile['@_symmetry']}',\n`;
+	generatedCode += '\tconnections: [\n';
+	generatedCode += '\t\t"xxx",\n';
+	generatedCode += '\t\t"xxx",\n';
+	generatedCode += '\t\t"xxx",\n';
+	generatedCode += '\t\t"xxx",\n';
+	generatedCode += '\t],\n';
+	generatedCode += '};\n';
 }
-generatedCode += '}\n';
+generatedCode += 'export default () => simpleTiledModel({\n';
+generatedCode += '\twidth: ,\n';
+generatedCode += '\theight: ,\n';
+generatedCode += '\ttiles: {\n';
+for (const tile of tiles) {
+	generatedCode += `\t\t${tile['@_name']},\n`;
+}
+generatedCode += '\t}\n';
+generatedCode += '});\n';
+// eslint-disable-next-line no-console
 console.log(generatedCode);

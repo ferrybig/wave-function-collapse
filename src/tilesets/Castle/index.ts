@@ -1,4 +1,4 @@
-import { SimpleTile } from '../../models/simple-tiled-model';
+import { SimpleTile, simpleTiledModel } from '../../models/simple-tiled-model';
 import bridgeImage from './bridge.png';
 import groundImage from './ground.png';
 import riverImage from './river.png';
@@ -11,136 +11,166 @@ import wallImage from './wall.png';
 import wallriverImage from './wallriver.png';
 import wallroadImage from './wallroad.png';
 
-
-export const width = 7;
-export const height = 7;
-
 const ROAD = 'R';
 const WATER = 'W';
 const LAND = 'L';
 const WALL = '#';
 
-export const tiles: Record<string, SimpleTile> = {
-	bridge: {
-		images: [bridgeImage],
-		weight: 1,
-		symmetry: 'I',
-		connections: [
-			WATER,
-			ROAD,
-			WATER,
-			ROAD,
-		],
-	},
-	ground: {
-		images: [groundImage],
-		weight: 1,
-		symmetry: 'X',
-		connections: [
-			LAND,
-			LAND,
-			LAND,
-			LAND,
-		],
-	},
-	river:  {
-		images: [riverImage],
-		weight: 1,
-		symmetry: 'I',
-		connections: [
-			WATER,
-			LAND,
-			WATER,
-			LAND,
-		],
-	},
-	riverturn:  {
-		images: [riverturnImage],
-		weight: 1,
-		symmetry: 'L',
-		connections: [
-			WATER,
-			WATER,
-			LAND,
-			LAND,
-		],
-	},
-	road:  {
-		images: [roadImage],
-		weight: 1,
-		symmetry: 'I',
-		connections: [
-			ROAD,
-			LAND,
-			ROAD,
-			LAND,
-		],
-	},
-	roadturn:  {
-		images: [roadturnImage],
-		weight: 1,
-		symmetry: 'L',
-		connections: [
-			ROAD,
-			ROAD,
-			LAND,
-			LAND,
-		],
-	},
-	t: {
-		images: [tImage],
-		weight: 1,
-		symmetry: 'T',
-		connections: [
-			LAND,
-			ROAD,
-			ROAD,
-			ROAD,
-		],
-	},
-	tower: {
-		images: [towerImage],
-		weight: 1,
-		symmetry: 'L',
-		connections: [
-			WALL,
-			WALL,
-			LAND,
-			LAND,
-		],
-		avoidSelf: true,
-	},
-	wall:  {
-		images: [wallImage],
-		weight: 1,
-		symmetry: 'I',
-		connections: [
-			WALL,
-			LAND,
-			WALL,
-			LAND,
-		],
-	},
-	wallriver: {
-		images: [wallriverImage],
-		weight: 1,
-		symmetry: 'I',
-		connections: [
-			WALL,
-			WATER,
-			WALL,
-			WATER,
-		],
-	},
-	wallroad:  {
-		images: [wallroadImage],
-		weight: 1,
-		symmetry: 'I',
-		connections: [
-			WALL,
-			ROAD,
-			WALL,
-			ROAD,
-		],
-	},
+const bridge: SimpleTile = {
+	images: [bridgeImage],
+	weight: 1,
+	symmetry: 'I',
+	connections: [
+		WATER,
+		ROAD,
+		WATER,
+		ROAD,
+	],
 };
+const ground: SimpleTile = {
+	images: [groundImage],
+	weight: 1,
+	symmetry: 'X',
+	connections: [
+		LAND,
+		LAND,
+		LAND,
+		LAND,
+	],
+};
+const river: SimpleTile = {
+	images: [riverImage],
+	weight: 1,
+	symmetry: 'I',
+	connections: [
+		WATER,
+		LAND,
+		WATER,
+		LAND,
+	],
+};
+const riverturn: SimpleTile = {
+	images: [riverturnImage],
+	weight: 1,
+	symmetry: 'L',
+	connections: [
+		WATER,
+		WATER,
+		LAND,
+		LAND,
+	],
+};
+const road: SimpleTile = {
+	images: [roadImage],
+	weight: 1,
+	symmetry: 'I',
+	connections: [
+		ROAD,
+		LAND,
+		ROAD,
+		LAND,
+	],
+};
+const roadturn: SimpleTile = {
+	images: [roadturnImage],
+	weight: 1,
+	symmetry: 'L',
+	connections: [
+		ROAD,
+		ROAD,
+		LAND,
+		LAND,
+	],
+};
+const t: SimpleTile = {
+	images: [tImage],
+	weight: 1,
+	symmetry: 'T',
+	connections: [
+		LAND,
+		ROAD,
+		ROAD,
+		ROAD,
+	],
+};
+const tower: SimpleTile = {
+	images: [towerImage],
+	weight: 1,
+	symmetry: 'L',
+	connections: [
+		WALL,
+		WALL,
+		LAND,
+		LAND,
+	],
+	avoidSelf: true,
+};
+const wall: SimpleTile = {
+	images: [wallImage],
+	weight: 1,
+	symmetry: 'I',
+	connections: [
+		WALL,
+		LAND,
+		WALL,
+		LAND,
+	],
+	avoidSelf: [
+		false,
+		true,
+		false,
+		true,
+	],
+};
+const wallriver: SimpleTile = {
+	images: [wallriverImage],
+	weight: 1,
+	symmetry: 'I',
+	connections: [
+		WALL,
+		WATER,
+		WALL,
+		WATER,
+	],
+	avoidSelf: [
+		false,
+		true,
+		false,
+		true,
+	],
+};
+const wallroad: SimpleTile = {
+	images: [wallroadImage],
+	weight: 1,
+	symmetry: 'I',
+	connections: [
+		WALL,
+		ROAD,
+		WALL,
+		ROAD,
+	],
+	avoidSelf: [
+		true,
+		true,
+		true,
+		true,
+	],
+};
+
+export default () => simpleTiledModel({
+	width: 7,
+	height: 7,
+	tiles: {
+		bridge,
+		ground,
+		river,
+		riverturn,
+		road,
+		roadturn,
+		t,
+		tower,
+		wall,
+		wallriver,
+		wallroad,
+	},
+});

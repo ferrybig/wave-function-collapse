@@ -1,6 +1,4 @@
 import tileSets from './tilesets';
-import { Tile } from './Tile';
-import { simpleTiledModel } from './models/simple-tiled-model';
 import { LoadedTiles } from './LoadedTiles';
 import { TilePreview } from './ui';
 import generation from './generation';
@@ -20,57 +18,51 @@ export function configuration(generatorModule: ReturnType<typeof generation>) {
 	const tileSize = document.querySelector<HTMLOutputElement>('#tileSize')!;
 	const tileSetElement = document.querySelector<HTMLSelectElement>('#tileset')!;
 
-	interface LoadedTiles {
-		width: number,
-		height: number,
-		tiles: Tile[]
-	}
-
-	const EMPTY_TILES: LoadedTiles = {
-		width: 0,
-		height: 0,
-		tiles: [],
-	};
-
-	let tiles: LoadedTiles = EMPTY_TILES;
-	let selectedTileSet = '';
-
-	for (const [name] of tileSets) {
-		const option = document.createElement('option');
-		option.innerText = name;
-		tileSetElement.appendChild(option);
-	}
-
 	const tilePreview = new TilePreview();
 	tileSetSection.appendChild(tilePreview);
 
-	function onSizeChange() {
-		tileSize.value = `${tiles.width}px x ${tiles.height}px`;
+	const hash = decodeURI(location.hash.substring(1));
 
-		if (height.valueAsNumber > 0 && width.valueAsNumber > 0 && tiles.tiles.length > 0) {
+	let selectedTileSet: LoadedTiles | null = null;
+	let lastGroup: HTMLOptGroupElement | null = null;
+
+	for (const { group, subName, value, factory } of tileSets) {
+		if (lastGroup?.label !== group) {
+			lastGroup = document.createElement('optgroup');
+			lastGroup.label = group;
+			tileSetElement.appendChild(lastGroup);
+		}
+		const option = document.createElement('option');
+		option.innerText = `${group  }/${  subName}`;
+		option.value = value;
+		lastGroup.appendChild(option);
+		if (value === hash) {
+			tileSetElement.value = value;
+			selectedTileSet = factory();
+			tilePreview.render(selectedTileSet);
+		}
+	}
+
+	function onSizeChange() {
+		if (height.valueAsNumber > 0 && width.valueAsNumber > 0 && selectedTileSet && selectedTileSet.tiles.length > 0) {
 			generatorModule.setSize(width.valueAsNumber, height.valueAsNumber);
-			generatorModule.setTiles(tiles);
+			generatorModule.setTiles(selectedTileSet);
 		}
 	}
 	width.addEventListener('input', onSizeChange);
 	height.addEventListener('input', onSizeChange);
+	onSizeChange();
 
 	async function onTileSetChange() {
-		tiles = EMPTY_TILES;
 		const value = tileSetElement.value;
-		selectedTileSet = value;
-		const loaded = await tileSets.find(([key]) => key === value)?.[1]();
-		if (loaded && selectedTileSet === value) {
-			tiles = {
-				tiles: simpleTiledModel(loaded),
-				height: loaded.height,
-				width: loaded.width,
-			};
-			onSizeChange();
-			tilePreview.render(tiles);
-		}
+		const entry = tileSets.find((opt) => opt.value === value);
+		if (!entry) return;
+		selectedTileSet = entry.factory();
+		tileSize.value = `${selectedTileSet.width}px x ${selectedTileSet.height}px`;
+		onSizeChange();
+		location.replace(`#${  encodeURI(value)}`);
+		tilePreview.render(selectedTileSet);
 	}
 	tileSetElement.addEventListener('change', onTileSetChange);
 	configuration.addEventListener('reset', () => setTimeout(onSizeChange));
-	onTileSetChange();
 }

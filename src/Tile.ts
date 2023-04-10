@@ -16,7 +16,12 @@ export class Tile {
 		loadPromise: Promise<unknown>,
 		public readonly id: string,
 		public readonly baseName: string,
-		public readonly avoidSelfConnection: boolean,
+		public readonly avoidSelfConnection: [
+			boolean,
+			boolean,
+			boolean,
+			boolean,
+		],
 	) {
 		this.loadPromise = loadPromise.then((e) => {
 			this.isLoaded = true;
