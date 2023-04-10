@@ -73,6 +73,7 @@ body {
 	overflow: clip;
 	inset: 0;
 	cursor: grab;
+	border-radius: 4px;
 }
 .output-grid__canvas {
 	background: var(--background);
