@@ -7,6 +7,24 @@ const reverse = memoize((connector: string) => {
 	key: (i) => i,
 });
 
+function filterTiles(tile: Tile, myConnection: 0 | 1 | 2 | 3, other: Tile[] | 'any' | 'mirror') {
+	if (other === 'mirror') {
+		return tile.connections[myConnection] === reverse(tile.connections[myConnection]) && !tile.avoidSelfConnection[myConnection];
+	}
+	if (other === 'any' || other.length === 0) {
+		return true;
+	}
+	const otherConnection =
+		myConnection === 0 ? 2 :
+		myConnection === 1 ? 3 :
+		myConnection === 2 ? 0 :
+		1;
+	return other.find(topTile =>
+		tile.connections[myConnection] === reverse(topTile.connections[otherConnection]) &&
+			(!tile.avoidSelfConnection[myConnection] || tile.baseName !== topTile.baseName),
+	);
+}
+
 export class TileCache {
 	public readonly maxWeight: number;
 	constructor(
@@ -15,26 +33,22 @@ export class TileCache {
 		this.maxWeight = validOptions.reduce((a, c) => a + c.weight, 0);
 	}
 
-	public readonly getTileConnections = memoize((top: Tile[], right: Tile[], bottom: Tile[], left: Tile[]) =>
-		this.validOptions.filter(tile =>
-			(top.length === 0 || top.find(topTile =>
-				tile.connections[0] === reverse(topTile.connections[2]) &&
-				(!tile.avoidSelfConnection[0] || tile.baseName !== topTile.baseName),
-			)) &&
-			(right.length === 0 || right.find(rightTile =>
-				tile.connections[1] === reverse(rightTile.connections[3]) &&
-				(!tile.avoidSelfConnection[1] || tile.baseName !== rightTile.baseName),
-			)) &&
-			(bottom.length === 0 || bottom.find(bottomTile =>
-				tile.connections[2] === reverse(bottomTile.connections[0]) &&
-				(!tile.avoidSelfConnection[2] || tile.baseName !== bottomTile.baseName),
-			)) &&
-			(left.length === 0 || left.find(leftTile =>
-				tile.connections[3] === reverse(leftTile.connections[1]) &&
-				(!tile.avoidSelfConnection[3] || tile.baseName !== leftTile.baseName),
-			)),
-		)
-	, {
-		key: (...sides) => sides.map(e => `[${e.map(t => t.id).join(',')}]`).join(','),
-	});
+	public readonly getTileConnections = memoize(
+		(
+			top: Tile[] | 'any' | 'mirror',
+			right: Tile[] | 'any' | 'mirror',
+			bottom: Tile[] | 'any' | 'mirror',
+			left: Tile[] | 'any' | 'mirror',
+		): Tile[] | 'any' => {
+			const newOptions = this.validOptions.filter(tile =>
+				filterTiles(tile, 0, top) &&
+				filterTiles(tile, 1, right) &&
+				filterTiles(tile, 2, bottom) &&
+				filterTiles(tile, 3, left),
+			);
+			return newOptions.length === this.validOptions.length ? 'any' : newOptions;
+		}, {
+			key: (...sides) => JSON.stringify(sides),
+		},
+	);
 }

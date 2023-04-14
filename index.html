@@ -30,15 +30,48 @@
 					<span>Height in tiles</span>
 					<input id="height" type="number" required value="10" step="1" min="1">
 				</label>
-				<span class="controls">
-					<button type="reset">
-						Reset
-					</button>
-				</span>
+				<label class="controls">
+					<span>Seed (empty means random seed</span>
+					<input id="configuration__seed">
+				</label>
+				<label class="controls">
+					<span>On stuck tile</span>
+					<select id="configuration__stuck_tile" disabled>
+						<option>halt</option>
+						<option selected>ignore</option>
+						<option>backtrack</option>
+					</select>
+				</label>
+				<label class="controls">
+					<span>Left/right edge behavior</span>
+					<select id="configuration__horizontal_mode">
+						<option value="none">Permit any</option>
+						<option value="wrap">Wrap around</option>
+						<option value="mirror">Mirror</option>
+					</select>
+				</label>
+				<label class="controls">
+					<span>Top/bottom edge behavior</span>
+					<select id="configuration__vertical_mode">
+						<option value="none">Permit any</option>
+						<option value="wrap">Wrap around</option>
+						<option value="mirror">Mirror</option>
+					</select>
+				</label>
 			</form>
 			<div class="app__generate generation">
-				<span class="generation__buttons" id="generation-buttons">
+				<span class="generation__buttons">
+					<button id="generation-buttons__play">play</button>
+					<button id="generation-buttons__step">step</button>
+					<button id="generation-buttons__reset">reset</button>
 				</span>
+				<span class="generation__buttons">
+					<button id="generation-buttons__regenerate">Re-generate</button>
+				</span>
+				<label class="controls controls--checkbox">
+					<input type="checkbox" id="generation-buttons__auto-generate">
+					<span>State</span>
+				</label>
 				<label class="controls">
 					<span>State</span>
 					<output id="generateStatus">

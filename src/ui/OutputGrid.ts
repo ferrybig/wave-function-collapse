@@ -1,5 +1,5 @@
 import { create } from 'random-seed';
-import { Grid, GridCell, TileCache, waveCollapseStep } from '../algorithm';
+import { EdgeMode, Grid, GridCell, TileCache } from '../algorithm';
 import { LoadedTiles } from '../LoadedTiles';
 
 interface OutputGridEventMap {
@@ -19,7 +19,9 @@ export class OutputGrid extends HTMLElement {
 	#cache = new TileCache([]);
 	#seed = '';
 	#random = create(this.#seed);
-	#grid = new Grid(this.#x, this.#y, this.#cache);
+	#horizontalMode: 'mirror' | 'wrap' | 'none' = 'none';
+	#verticalMode: 'mirror' | 'wrap' | 'none' = 'none';
+	#grid = new Grid(this.#x, this.#y, this.#cache, this.#horizontalMode, this.#verticalMode);
 	#needsRender: GridCell[] = [];
 	#autoPlaySpeed = Number.POSITIVE_INFINITY;
 	#autoPlayLastUpdate = Date.now();
@@ -76,7 +78,7 @@ export class OutputGrid extends HTMLElement {
 		this.#canvas.style.imageRendering = this.#scale > 1 ? 'pixelated' : '';
 	}
 	#step() {
-		const updates = waveCollapseStep(this.#grid, this.#random);
+		const updates = this.#grid.collapse(this.#random);
 		this.#needsRender.push(...updates);
 		this.#progress += updates.length;
 		return updates.length > 0;
@@ -152,7 +154,7 @@ export class OutputGrid extends HTMLElement {
 	public reset() {
 		this.#needsReset = false;
 		this.#needsRender = [];
-		this.#grid = new Grid(this.#x, this.#y, this.#cache);
+		this.#grid = new Grid(this.#x, this.#y, this.#cache, this.#horizontalMode, this.#verticalMode);
 		this.#canvas.width = this.#x*this.#tileWidth;
 		this.#canvas.height = this.#y*this.#tileHeight;
 		this.#ctx = this.#canvas.getContext('2d')!;
@@ -197,6 +199,7 @@ export class OutputGrid extends HTMLElement {
 		this.#needsReset ||= this.#x !== x || this.#y !== y;
 		this.#x = x;
 		this.#y = y;
+		if (this.#needsReset && this.#autoPlay) this.reset();
 	}
 	public setTiles(tiles: LoadedTiles) {
 		if (tiles.tiles !== this.#cache.validOptions) {
@@ -205,11 +208,13 @@ export class OutputGrid extends HTMLElement {
 			this.#tileHeight = tiles.height;
 			this.#needsReset = true;
 			Promise.all(tiles.tiles.map(t => t.loadPromise)).then(() => this.#render());
+			if (this.#autoPlay) this.reset();
 		}
 	}
 	public setSeed(seed: string) {
 		this.#needsReset ||= this.#seed !== seed;
 		this.#seed = seed;
+		if (this.#needsReset && this.#autoPlay) this.reset();
 	}
 	#emit<K extends keyof OutputGridEventMap>(type: K, value: OutputGridEventMap[K]) {
 		const subList = this.#listeners[type] as ((this: OutputGrid, ev: unknown) => void)[];
@@ -232,6 +237,19 @@ export class OutputGrid extends HTMLElement {
 
 	public getTotal() {
 		return this.#grid.x * this.#grid.y;
+	}
+
+	public setHorizontalMode(horizontalMode: EdgeMode) {
+		this.#needsReset ||= this.#horizontalMode !== horizontalMode;
+		this.#horizontalMode = horizontalMode;
+		this.#needsReset = true;
+		if (this.#needsReset && this.#autoPlay) this.reset();
+	}
+
+	public setVerticalMode(verticalMode: EdgeMode) {
+		this.#needsReset ||= this.#verticalMode !== verticalMode;
+		this.#verticalMode = verticalMode;
+		if (this.#needsReset && this.#autoPlay) this.reset();
 	}
 }
 

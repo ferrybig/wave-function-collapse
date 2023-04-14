@@ -6,5 +6,6 @@ export default defineConfig({
 		modulePreload: {
 			polyfill: false,
 		},
+		target: ['chrome111', 'firefox111'],
 	},
 });

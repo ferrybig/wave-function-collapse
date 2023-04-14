@@ -1,7 +1,10 @@
+import { RandomSeed } from 'random-seed';
 import { Tile } from '../Tile';
 import { GridCell } from './GridCell';
 import { NextCalculator } from './NextCalculator';
 import { TileCache } from './TileCache';
+
+export type EdgeMode = 'mirror' | 'wrap' | 'none';
 
 export class Grid {
 	#next: [number, (readonly GridCell[])[], boolean] = [0, [], false];
@@ -12,12 +15,21 @@ export class Grid {
 		public readonly x: number,
 		public readonly y: number,
 		public readonly cache: TileCache,
+		public readonly horizontalMode: EdgeMode,
+		public readonly verticalMode: EdgeMode,
 	) {
 		let generated = 0;
 		let current = new NextCalculator([]);
+		const needsUpdate = new Set<GridCell>();
 		for (let i = 0; i < x; i++) {
 			for (let j = 0; j < y; j++) {
 				const cell = new GridCell(i, j, null, cache.validOptions, this.cache.maxWeight);
+				if (
+					(horizontalMode === 'mirror' && (i=== 0 || i === x - 1)) ||
+					(verticalMode === 'mirror' && (j === 0 || j === y - 1))
+				) {
+					needsUpdate.add(cell);
+				}
 				this.#cells.push(cell);
 				current.push(cell);
 				if (generated++ > 1000) {
@@ -29,12 +41,15 @@ export class Grid {
 		}
 		this.#nextCalcs.push(current);
 		this.#next = [this.#cells.length, [this.#cells], false];
+		if (needsUpdate.size > 0) {
+			this.recomputeCells(needsUpdate, []);
+		}
 	}
 	#getCellOrNull(x: number, y: number): GridCell | null {
-		if (x < 0) return null;
-		if (y < 0) return null;
-		if (x >= this.x) return null;
-		if (y >= this.y) return null;
+		if (x < 0) return this.horizontalMode === 'wrap' ? this.#getCellOrNull(x + this.x, y) : null;
+		if (y < 0) return this.verticalMode === 'wrap' ? this.#getCellOrNull(x, y + this.y) : null;
+		if (x >= this.x) return this.horizontalMode === 'wrap' ? this.#getCellOrNull(x - this.x, y) : null;
+		if (y >= this.y) return this.verticalMode === 'wrap' ? this.#getCellOrNull(x, y - this.y) : null;
 		return this.#cells[x * this.y + y];
 	}
 	public getCells() {
@@ -67,21 +82,17 @@ export class Grid {
 		this.#next = next;
 	}
 
-	public setTile(cell: GridCell, tile: Tile): GridCell[] {
-		cell.tile = tile;
-		cell.validOptions = [tile];
-		cell.validOptionsWeight = 0;
-		const changedCells: GridCell[] = [cell];
-		for (const callback of cell.onUpdate) {
-			callback();
-		}
+	private recomputeCell(cell: GridCell, setCells: GridCell[]) {
 		const toUpdate = new Set<GridCell>();
 		const [top, right, bottom, left] = this.#getNeighbors(cell);
 		if (top) toUpdate.add(top);
 		if (right) toUpdate.add(right);
 		if (bottom) toUpdate.add(bottom);
 		if (left) toUpdate.add(left);
+		this.recomputeCells(toUpdate,setCells);
+	}
 
+	private recomputeCells(toUpdate: Set<GridCell>, setCells: GridCell[]) {
 		do {
 			for (const entry of toUpdate) {
 				toUpdate.delete(entry);
@@ -97,12 +108,24 @@ export class Grid {
 					if (bottom) toUpdate.add(bottom);
 					if (left) toUpdate.add(left);
 					if (newSet === 'set') {
-						changedCells.push(entry);
+						setCells.push(entry);
 					}
 				}
 			}
 		} while (toUpdate.size > 0);
 		this.#updateNextList();
+	}
+
+	public setTile(cell: GridCell, tile: Tile): GridCell[] {
+		cell.tile = tile;
+		cell.validOptions = [tile];
+		cell.validOptionsWeight = 0;
+		const changedCells: GridCell[] = [cell];
+		for (const callback of cell.onUpdate) {
+			callback();
+		}
+		this.recomputeCell(cell, changedCells);
+
 		return changedCells;
 	}
 	#updateValidOptions(cell: GridCell): 'no-change' | 'updated-valid' | 'set' {
@@ -117,9 +140,9 @@ export class Grid {
 			bottom?.validOptions ?? this.cache.validOptions,
 			left?.validOptions ?? this.cache.validOptions,
 		);
-		cell.validOptionsWeight = cell.validOptions.reduce((a, c) => a + c.weight, 0);
+		cell.validOptionsWeight = cell.validOptions === 'any' ? this.cache.maxWeight : cell.validOptions.reduce((a, c) => a + c.weight, 0);
 		const newLength = cell.validOptions.length;
-		if (newLength === 1) {
+		if (newLength === 1 && cell.validOptions !== 'any') {
 			cell.tile = cell.validOptions[0];
 			cell.validOptionsWeight = 0;
 			return 'set';
@@ -133,5 +156,50 @@ export class Grid {
 			this.#getCellOrNull(cell.x, cell.y + 1), // bottom
 			this.#getCellOrNull(cell.x - 1, cell.y), // left
 		] as const;
+	}
+
+	collapse(random: RandomSeed): GridCell[] {
+		const nextInSequenceList = this.getNextCells();
+		if (nextInSequenceList[0] === 0) return [];
+		let picked = random.intBetween(0, nextInSequenceList[0] - 1);
+		let nextInSequence: GridCell | null = null;
+		for (const t of nextInSequenceList[1]) {
+			if (picked < t.length) {
+				nextInSequence = t[picked];
+				break;
+			}
+			picked -= t.length;
+		}
+		if (!nextInSequence) {
+			throw new Error('Was unable to pick a tile');
+		}
+		if (nextInSequence.tile) {
+			throw new Error('Next already got a tile???');
+		}
+		if (nextInSequence.validOptions.length === 0) return [];
+		let tile: Tile | null;
+		switch (nextInSequence.validOptions.length) {
+		case 0:
+			return [];
+		case 1:
+			tile = nextInSequence.validOptions[0] as Tile;
+			break;
+		default: {
+			const value = random.floatBetween(0, nextInSequence.validOptionsWeight);
+			let accumulator = 0;
+			tile = null;
+			for (const t of nextInSequence.validOptions === 'any' ? this.cache.validOptions : nextInSequence.validOptions) {
+				accumulator += t.weight;
+				if (accumulator > value) {
+					tile = t;
+					break;
+				}
+			}
+			if (!tile) {
+				throw new Error('Got null tile??');
+			}
+		}
+		}
+		return this.setTile(nextInSequence, tile);
 	}
 }

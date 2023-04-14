@@ -2,6 +2,7 @@ import tileSets from './tilesets';
 import { LoadedTiles } from './LoadedTiles';
 import { TilePreview } from './ui';
 import generation from './generation';
+import { EdgeMode } from './algorithm';
 
 export interface Configuration {
 	valid: boolean,
@@ -15,6 +16,8 @@ export function configuration(generatorModule: ReturnType<typeof generation>) {
 	const configuration = document.querySelector<HTMLFormElement>('#configuration')!;
 	const width = document.querySelector<HTMLInputElement>('#width')!;
 	const height = document.querySelector<HTMLInputElement>('#height')!;
+	const horizontalMode = document.querySelector<HTMLInputElement>('#configuration__horizontal_mode')!;
+	const verticalMode = document.querySelector<HTMLInputElement>('#configuration__vertical_mode')!;
 	const tileSize = document.querySelector<HTMLOutputElement>('#tileSize')!;
 	const tileSetElement = document.querySelector<HTMLSelectElement>('#tileset')!;
 
@@ -46,15 +49,19 @@ export function configuration(generatorModule: ReturnType<typeof generation>) {
 		tileSetElement.value = '--disabled--';
 	}
 
-	function onSizeChange() {
+	function onUpdate() {
 		if (height.valueAsNumber > 0 && width.valueAsNumber > 0 && selectedTileSet && selectedTileSet.tiles.length > 0) {
 			generatorModule.setSize(width.valueAsNumber, height.valueAsNumber);
+			generatorModule.setHorizontalMode(horizontalMode.value as EdgeMode);
+			generatorModule.setVerticalMode(verticalMode.value as EdgeMode);
 			generatorModule.setTiles(selectedTileSet);
 		}
 	}
-	width.addEventListener('input', onSizeChange);
-	height.addEventListener('input', onSizeChange);
-	onSizeChange();
+	width.addEventListener('input', onUpdate);
+	height.addEventListener('input', onUpdate);
+	horizontalMode.addEventListener('input', onUpdate);
+	verticalMode.addEventListener('input', onUpdate);
+	onUpdate();
 
 	async function onTileSetChange() {
 		const value = tileSetElement.value;
@@ -62,10 +69,10 @@ export function configuration(generatorModule: ReturnType<typeof generation>) {
 		if (!entry) return;
 		selectedTileSet = entry.factory();
 		tileSize.value = `${selectedTileSet.width}px x ${selectedTileSet.height}px`;
-		onSizeChange();
-		location.replace(`#${  encodeURI(value)}`);
+		onUpdate();
+		location.replace(`#${encodeURI(value)}`);
 		tilePreview.render(selectedTileSet);
 	}
 	tileSetElement.addEventListener('change', onTileSetChange);
-	configuration.addEventListener('reset', () => setTimeout(onSizeChange));
+	configuration.addEventListener('reset', () => setTimeout(onUpdate));
 }

@@ -6,7 +6,7 @@ export class GridCell {
 		public readonly x: number,
 		public readonly y: number,
 		public tile: Tile | null,
-		public validOptions: Tile[],
+		public validOptions: Tile[] | 'any',
 		public validOptionsWeight: number,
 	) {
 	}
